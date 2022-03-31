@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 const Schema = mongoose.Schema
 
-const UserSchema = new Schema({
+const tradeSchema = new Schema({
     userId: String,
     amount: Number,
     usdPrice: Number,
@@ -11,4 +11,4 @@ const UserSchema = new Schema({
     }
 })
 
-export = mongoose.model('users' , UserSchema)
+export = mongoose.model('trades' , tradeSchema)

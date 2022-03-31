@@ -1,78 +1,79 @@
-export default function Header(){
+import { SetStateAction, useEffect, useState } from "react"
+import { api } from "../services/api"
+import formatCurrency from "../utils/formatCurrency"
+
+type TableProps = {
+    user: {
+        email?: string
+        _id?: string
+    }
+    trades: TradeProps[]
+    setTrades: any
+}
+
+type TradeProps = {
+    _id:string
+    amount: number
+    usdPrice: number
+    date: string
+}
+
+export default function TradesTable({ user , trades , setTrades }: TableProps){
+
+    useEffect(() => {
+        console.log(trades);
+        
+        if(user._id){
+            api.get(`/trades/${user._id}`)
+            .then(response => {
+                setTrades(response.data.trades)
+            })
+        }
+    },[user])
+
     return(
-        <div className="w-3/6 m-auto shadow-md sm:rounded-lg">
-            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <div className="w-3/6 m-auto relative overflow-x-auto shadow-md sm:rounded-lg mt-10 mb-10">
+            <table className=" rounded w-full text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
                         <th scope="col" className="px-6 py-3">
-                            Product name
+                            Price in USD
                         </th>
                         <th scope="col" className="px-6 py-3">
-                            Color
+                            Amount
                         </th>
                         <th scope="col" className="px-6 py-3">
-                            Category
+                            Total
                         </th>
                         <th scope="col" className="px-6 py-3">
-                            Price
-                        </th>
-                        <th scope="col" className="px-6 py-3">
-                            <span className="sr-only">Edit</span>
+                            Date
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                            Apple MacBook Pro 17
-                        </th>
-                        <td className="px-6 py-4">
-                            Sliver
-                        </td>
-                        <td className="px-6 py-4">
-                            Laptop
-                        </td>
-                        <td className="px-6 py-4">
-                            $2999
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                            <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
-                        </td>
-                    </tr>
-                    <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                            Microsoft Surface Pro
-                        </th>
-                        <td className="px-6 py-4">
-                            White
-                        </td>
-                        <td className="px-6 py-4">
-                            Laptop PC
-                        </td>
-                        <td className="px-6 py-4">
-                            $1999
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                            <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
-                        </td>
-                    </tr>
-                    <tr className="bg-white dark:bg-gray-800">
-                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                            Magic Mouse 2
-                        </th>
-                        <td className="px-6 py-4">
-                            Black
-                        </td>
-                        <td className="px-6 py-4">
-                            Accessories
-                        </td>
-                        <td className="px-6 py-4">
-                            $99
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                            <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
-                        </td>
-                    </tr>
+                    {
+                        trades.map( trade => (
+                            <tr key={trade._id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                                    {formatCurrency(trade.usdPrice, "USD")}
+                                </th>
+                                <td className="px-6 py-4">
+                                    {formatCurrency(trade.amount , "GBP")}
+                                </td>
+                                <td className="px-6 py-4">
+                                    {formatCurrency(trade.amount * trade.usdPrice , "USD")}
+                                </td>
+                                <td className="px-6 py-4">
+                                    {new Date(trade.date).toLocaleDateString('en-UK',{
+                                        day: '2-digit',
+                                        month: 'long',
+                                        year: 'numeric'
+                                    })}
+                                </td>
+                
+                            </tr>
+                        ))
+                    }
                 </tbody>
             </table>
         </div>

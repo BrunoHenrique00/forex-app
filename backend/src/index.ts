@@ -1,17 +1,18 @@
 import http from 'http';
-import express, { Express } from 'express';
-import { Server } from 'socket.io';
 import dotenv from 'dotenv'
 import getMongoClient from './util/db'
+import express, { Express } from 'express';
 import userRouter from './routes/user'
+import tradesRouter from './routes/trades'
+import { makeWebSocketServer } from './websocket';
 
-const PORT = process.env.PORT ?? 8080;
 dotenv.config()
-getMongoClient()
+getMongoClient(process.env.MONGODB_URL!)
 
 const app: Express = express();
-const server = http.createServer(app);
-const io = new Server(server);
+const PORT = process.env.PORT ?? 8080;
+
+let usdPrice = 0;
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -26,12 +27,28 @@ app.use((req, res, next) => {
     next();
 });
 
-// SOCKET SERVICE
-io.on('connection', (socket) => {
-    console.log('a user connected');
-});
-
 /** Routes */
 app.use('/', userRouter);
+app.use('/', tradesRouter);
+app.get('/price' , (req , res ) => {
+    return res.json({
+        price: usdPrice
+    })
+})
+
+const server = http.createServer(app);
+// SOCKET SERVICE
+const { io , wss } = makeWebSocketServer(server)
+
+wss.onmessage = (message) => {
+    const data = JSON.parse(message.data as any)
+    usdPrice = parseFloat(data.p)
+    io.emit("price", {
+        price: usdPrice
+    })
+}
 
 server.listen(PORT, () => console.log(`The server is running on port ${PORT}`));
+
+// export server to Test
+export = server;

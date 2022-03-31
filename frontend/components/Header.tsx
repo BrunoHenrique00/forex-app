@@ -1,4 +1,14 @@
-export default function Header(){
+import Link from "next/link"
+
+type HeaderProps = {
+    user: {
+        email?: string
+        _id?: string
+    }
+}
+
+export default function Header({ user }: HeaderProps){
+    
     return(
         <nav className="flex justify-around py-4 bg-white/80
             backdrop-blur-md shadow-md w-full">
@@ -19,11 +29,25 @@ export default function Header(){
             </div>
 
             <div className="flex items-center space-x-5">
-                <a className="flex
-                    cursor-pointer transition-colors duration-300
+                {
+                    user &&
+                    <span className="flex
+                    transition-colors duration-300
                     font-semibold text-indigo-600">
-                    Login
-                </a>
+                        Welcome, {user.email}
+                    </span>
+                }
+
+                {
+                    !user &&
+                    <Link href='/login'>
+                        <a className="flex
+                        cursor-pointer transition-colors duration-300
+                        font-semibold text-indigo-600">
+                            Login
+                        </a>
+                    </Link>
+                }
             </div>
         </nav>
     )

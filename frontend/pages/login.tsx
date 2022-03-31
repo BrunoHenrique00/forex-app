@@ -1,10 +1,31 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { FormEvent, useRef } from 'react'
+import { toast } from 'react-toastify'
+import { api } from '../services/api'
 
 const Login: NextPage = () => {
-    function handleLogin(){
+    const router = useRouter()
+    const emailRef = useRef<HTMLInputElement>(null)
 
+    async function handleLogin(e: FormEvent){
+      e.preventDefault()
+      try {
+        const email = emailRef?.current?.value
+        const response = await api.post('/user/login', {
+          email
+        })
+        if(response.data.user._id){
+          window.localStorage.setItem("userId" , response.data.user._id)
+          router.push('/dashboard')
+          return
+        }
+        toast.warn("User don't exists")
+      } catch (error) {
+        toast.warn("User don't exists")
+      }
     }
 
     return (
@@ -20,7 +41,7 @@ const Login: NextPage = () => {
           <div>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Log in to your account</h2>
           </div>
-          <form className="mt-8 space-y-6" action="#" method="POST">
+          <form className="mt-8 space-y-6" onSubmit={handleLogin}>
             <input type="hidden" name="remember" defaultValue="true" />
             <div className="rounded-md shadow-sm -space-y-px">
               <div>
@@ -31,6 +52,7 @@ const Login: NextPage = () => {
                   id="email-address"
                   name="email"
                   type="email"
+                  ref={emailRef}
                   autoComplete="email"
                   required
                   className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
@@ -43,7 +65,7 @@ const Login: NextPage = () => {
               <div className="text-sm">
                 <Link href='/'>
                   <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
-                    Already have a account?
+                    Not registered?
                   </a>
                 </Link>                
               </div>

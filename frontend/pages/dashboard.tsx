@@ -1,13 +1,68 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import TradesTable from '../components/TradesTable'
+import { api } from '../services/api'
 import formatCurrency from '../utils/formatCurrency'
+import { io } from 'socket.io-client'
+import Spinner from '../components/Spinner'
+import { toast } from 'react-toastify'
+
+type TradeProps = {
+    _id:string
+    amount: number
+    usdPrice: number
+    date: string
+}
 
 const Dashboard: NextPage = () => {
-    const [price , setPrice] = useState(1.36)
+    const [isLoading , setIsLoading] = useState(false)
+    const [price , setPrice] = useState(0)
     const [amount , setAmount] = useState(0)
+    const [user , setUser] = useState({})
+    const [trades , setTrades] = useState<TradeProps[]>([])
+
+    useEffect(() => {
+        const socket = io("http://localhost:8080")
+
+        socket.on("price", (data) => {   
+            setPrice(parseFloat(data.price))
+        })
+
+        api.get('/price')
+        .then(response => setPrice(response.data.price))
+
+        const userId = window.localStorage.getItem("userId")
+
+        api.post('/user/login' , {
+            userId
+        }).then(response =>{
+            if(response.data.user._id){
+                setUser(response.data.user)
+            }
+        })
+    },[])
+
+    async function handleTrade(){
+        const userId = window.localStorage.getItem("userId")
+        if(!userId) return alert("Please log in to trade")
+
+        setIsLoading(true)
+        const response = await api.post('/trades', {
+            usdPrice: price,
+            amount,
+            userId
+        })
+
+        setIsLoading(false)
+        if(response.data){
+            setTrades([...trades , response.data])
+            return toast.success("Trade sucessfully!")
+        }
+        
+        alert("Something went wrong!")
+    }
 
     return (
     <div>
@@ -16,7 +71,7 @@ const Dashboard: NextPage = () => {
             <link rel="icon" href="/favicon.ico" />
         </Head>
       
-        <Header />
+        <Header user={user} />
 
         <div className='w-3/6 m-auto mt-10 h-3/6 p-10 border border-gray-300 rounded flex flex-col'>
             <h2 className='font-bold m-auto'>Exchange GBP to USD</h2>
@@ -40,14 +95,17 @@ const Dashboard: NextPage = () => {
             className=' relative w-3/6 m-auto flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md 
             text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 
             focus:ring-indigo-500'
+            onClick={handleTrade}
             >
-                Exchange
+                {
+                    isLoading ? <Spinner isLoading={isLoading}/> : 'Exchange'
+                }
             </button>
 
             
         </div>
         
-        
+        <TradesTable user={user} trades={trades} setTrades={setTrades} />
     </div>
   )
 }

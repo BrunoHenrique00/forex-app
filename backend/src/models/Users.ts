@@ -3,8 +3,9 @@ const Schema = mongoose.Schema
 
 const UserSchema = new Schema({
     email: {
-        type: String
+        type: String,
+        unique: true
     }
 })
 
-export = mongoose.model('users' , UserSchema)
+export = mongoose.model('users' , UserSchema , 'users')
