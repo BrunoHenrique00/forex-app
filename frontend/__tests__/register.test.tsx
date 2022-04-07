@@ -1,13 +1,18 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { mocked } from 'jest-mock'
 import Home from '../pages/index'
 import { useRouter } from 'next/router'
 import { api } from '../services/api'
-import { RouterContext } from 'next/dist/shared/lib/router-context';
-import { createMockRouter } from './test-utils/createMockRouter'
 
 jest.mock('next/router')
 jest.mock('../services/api')
+
+beforeAll(() => {
+  const useRouterMocked = mocked(useRouter)
+  useRouterMocked.mockReturnValue({
+    locale: 'en'
+  } as any)
+})
 
 describe('Sign in Page', () => {
 
@@ -34,24 +39,28 @@ describe('Sign in Page', () => {
     expect(apiMocked).toHaveBeenCalledWith('/user' , { email: "" })
   })
 
-  // it('Should redirect a new user to dashboard', () => {
-  //   const apiMocked = mocked(api.post)
-  //   apiMocked.mockResolvedValueOnce({
-  //     data: {
-  //       _id: 'fake-id'
-  //     }
-  //   })
+  it('Should redirect a new user to dashboard', async () => {
+    const apiMocked = mocked(api.post)
+    const response = {
+      data: {
+        _id: "fake-id"
+      }
+    };
+    apiMocked.mockResolvedValue(response)
+    const useRouterMocked = mocked(useRouter)
+    const pushMocked = jest.fn()
 
-  //   const router = createMockRouter({})
+    useRouterMocked.mockReturnValueOnce({
+      push: pushMocked
+    } as any)
     
-  //   const { getByText } = render(
-  //     <RouterContext.Provider value={router}>
-  //       <Home />
-  //     </RouterContext.Provider>
-  //   )
-  //   const signInButton = getByText('Sign in')
-  //   fireEvent.click(signInButton)
+    const { getByText } = render(<Home />)
 
-  //   expect(router.push).toBeCalled()
-  // })
+    const signInButton = getByText('Sign in')
+    fireEvent.click(signInButton)
+
+    await waitFor(() => {
+      expect(pushMocked).toBeCalledWith('/dashboard')
+    })
+  })
 })

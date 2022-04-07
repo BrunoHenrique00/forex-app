@@ -8,6 +8,7 @@ frontend/.pnp.js
 backend/node_modules
 # testing
 frontend/coverage
+backend/src/coverage
 
 # next.js
 frontend/.next/

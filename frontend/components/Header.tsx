@@ -1,4 +1,7 @@
 import Link from "next/link"
+import { useRouter } from "next/router"
+import en from '../locales/en'
+import pt from '../locales/pt'
 
 type HeaderProps = {
     user: {
@@ -8,7 +11,9 @@ type HeaderProps = {
 }
 
 export default function Header({ user }: HeaderProps){
-    
+    const router = useRouter()
+    const translate = router.locale === 'en' ? en : pt
+
     return(
         <nav className="flex justify-around py-4 bg-white/80
             backdrop-blur-md shadow-md w-full">
@@ -21,25 +26,18 @@ export default function Header({ user }: HeaderProps){
                 </a>
             </div>
 
-            <div className="items-center hidden space-x-8 lg:flex">
-                <a className="flex text-gray-600 hover:text-indigo-600
-                    cursor-pointer transition-colors duration-300">
-                    My Trades
-                </a>
-            </div>
-
             <div className="flex items-center space-x-5">
                 {
-                    user &&
+                    user?._id &&
                     <span className="flex
                     transition-colors duration-300
                     font-semibold text-indigo-600">
-                        Welcome, {user.email}
+                        {translate["Welcome, "]} {user.email}
                     </span>
                 }
 
                 {
-                    !user &&
+                    !user._id &&
                     <Link href='/login'>
                         <a className="flex
                         cursor-pointer transition-colors duration-300

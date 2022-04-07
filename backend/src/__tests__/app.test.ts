@@ -82,7 +82,8 @@ describe("Test the /trades path", () => {
             const tradePayload = { 
                 userId: 'fake',
                 amount: 0,
-                usdPrice: 0
+                price: 0,
+                originalCurrency: "fake"
             }
             await request(app)
             .post(`/trades`)

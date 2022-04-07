@@ -43,6 +43,7 @@ const { io , wss } = makeWebSocketServer(server)
 wss.onmessage = (message) => {
     const data = JSON.parse(message.data as any)
     usdPrice = parseFloat(data.p)
+    
     io.emit("price", {
         price: usdPrice
     })

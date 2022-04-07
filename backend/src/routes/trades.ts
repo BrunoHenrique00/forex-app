@@ -20,16 +20,17 @@ router.get('/trades/:id' , (req , res) => {
 })
 
 router.post('/trades' , async (req , res ) => {
-    const { userId , amount , usdPrice } = req.body
+    const { userId , amount , price , originalCurrency } = req.body
 
     const newTrade = new Trade({
         userId,
         amount,
-        usdPrice
+        price,
+        originalCurrency
     })
     newTrade.save((err , user) => {
         if(err){
-            res.send(err)
+            return res.send(err)
         }
         res.status(201).send(user)
     })

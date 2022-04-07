@@ -1,7 +1,8 @@
 {
   "scripts": {
     "dev": "nodemon src/index.ts",
-    "test": "jest --forceExit -i"
+    "test": "jest --forceExit -i",
+    "test:coverage": "jest --collect-coverage"
   },
   "dependencies": {
     "express": "^4.17.3",
