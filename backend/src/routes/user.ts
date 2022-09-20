@@ -12,7 +12,8 @@ router.post('/user/login' , (req , res , next ) => {
     const { email , userId } = req.body
 
     if(userId){
-        User.findById(userId , (err: mongoose.CallbackError, user: UserProps) => {
+        User.findById(userId , ( err,user: UserProps) => {
+            
             if(user){
                 return res.json({
                     user
@@ -25,12 +26,13 @@ router.post('/user/login' , (req , res , next ) => {
         return 
     }
 
-    User.find({ email } , (err, [user]) => {
-        if(user){
+    User.find({ email: email } , ( err,user: UserProps) => {
+        if(user[0]){
             return res.json({
-                user
+                user: user[0]
             })
         }
+        
         return res.status(404).json({
             err: 'User not found!'
         })
@@ -39,13 +41,14 @@ router.post('/user/login' , (req , res , next ) => {
 
 router.post('/user', userController.checkIfUserExists , async (req , res ) => {
     const { email } = req.body
-
+    console.log("AQUI")
     const newUser = new User({
         email
     })
     newUser.save((err , user) => {
         if(err){
-            res.status(404).send(err)
+            console.log(err)
+            return res.status(404).send(err)
         }
         res.status(201).send(user)
     })

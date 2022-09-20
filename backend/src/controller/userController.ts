@@ -12,8 +12,8 @@ const checkIfUserExists = (req: Request , res: Response , next: NextFunction) =>
     const { email , userId } = req.body
 
     if(userId){
-        User.findById(userId , (err: mongoose.CallbackError, user: UserProps) => {
-            if(!user){
+        User.findById(userId , (err ,user: UserProps) => {
+            if(user){
                 return next()
             }
             return res.status(404).json({
@@ -23,8 +23,8 @@ const checkIfUserExists = (req: Request , res: Response , next: NextFunction) =>
         return 
     }
 
-    User.find({ email } , (err, [user]) => {
-        if(!user){
+    User.find({ email: email } , (err, user) => {
+        if(!user[0]){
             return next()
         }
 

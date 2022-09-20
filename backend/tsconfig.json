@@ -6,7 +6,8 @@
         "outDir": "./build",
         "target": "es6",
         "skipLibCheck": true,
-        "strict": true
+        "strict": true,
+        "noImplicitAny": false
     },
     "exclude": ["node_modules"]
 }

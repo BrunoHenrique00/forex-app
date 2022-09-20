@@ -36,3 +36,17 @@ backend/.env
 
 # typescript
 *.tsbuildinfo
+
+# CDK Stuff
+aws/.classpath.txt
+aws/target
+aws/.classpath
+aws/.project
+aws/.idea
+aws/.settings
+aws/.vscode
+aws/*.iml
+
+# CDK asset staging directory
+aws/.cdk.staging
+aws/cdk.out

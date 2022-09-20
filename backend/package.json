@@ -1,6 +1,7 @@
 {
   "scripts": {
     "dev": "nodemon src/index.ts",
+    "start": "ts-node src/index.ts",
     "test": "jest --forceExit -i",
     "test:coverage": "jest --collect-coverage"
   },
